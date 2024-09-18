@@ -443,12 +443,10 @@ while test "$#" -gt 0; do
 			ID_FILE="$s";
 			if test -e "$ID_FILE"; then
 				read -r ID < "$ID_FILE";
-			else
-				abrt "file \"$ID_FILE\" couldn't be found.";
-			fi;
 
-			if test "$(typeof "$ID")" != "uint" -o "$ID" -lt 1; then
-				abrt "ID must be a positive integer greater than 0, but was provided \"$s\".";
+				if test "$(typeof "$ID")" != "uint" -o "$ID" -lt 1; then
+					abrt "ID must be a positive integer greater than 0, but was provided \"$s\".";
+				fi;
 			fi;
 		;;
 		-s|--close|--close=*)

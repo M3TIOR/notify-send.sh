@@ -100,7 +100,7 @@ CMD_STATUS="$?";
 # Print full log to file.
 printf '%s' "$CMD_OUTPUT" > "$LOGFILE.action";
 # Two heads truncate the log into a reasonable size for a notification body.
-CMD_OUTPUT="$(printf '%s' "$CMD_OUTPUT" | head -4 | head 512)";
+CMD_OUTPUT="$(printf '%s' "$CMD_OUTPUT" | head -n 4 | head -c 512)";
 
 
 if $NOTIFY_CMD_SUCCESS && test "$CMD_STATUS" -eq 0; then

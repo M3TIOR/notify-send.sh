@@ -28,7 +28,7 @@ SELF=$(readlink -n -f "$0");
 PROCDIR="$(dirname "$SELF")"; # Process direcotry.
 APPNAME="$(basename "$SELF")";
 TMP="${XDG_RUNTIME_DIR:-/tmp}"; # XDG standard runtime directory.
-GDBUS_PIDF="$TMP/${APP_NAME:=${SELF##*/}}.$$.dat";
+GDBUS_PIDF="$TMP/${APPNAME:=${SELF##*/}}.$$.dat";
 LOGFILE="${LOGFILE:=$TMP/notify-action.$$.log}";
 ACTIONED="false";
 ACTIONC=0;
