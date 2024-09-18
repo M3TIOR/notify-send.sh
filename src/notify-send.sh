@@ -116,13 +116,14 @@ filter_pattern()
 	printf '%s' "$DONE";
 )
 
-long_divide()
-(
-	DIVIDEND="$1"; DIVISOR="$2"; RESULT=''; l=0; DECIMAL=false;
-	do
-	REMAINDER="$((DIVIDEND % DIVISOR))";
-	RESULT="${RESULT}$(( (DIVIDEND - REMAINDER) / DIVISOR ))";
-)
+# What did I just get board here? What the hell was I doing?!?
+#long_divide()
+#(
+#	DIVIDEND="$1"; DIVISOR="$2"; RESULT=''; l=0; DECIMAL=false;
+#	do
+#	REMAINDER="$((DIVIDEND % DIVISOR))";
+#	RESULT="${RESULT}$(( (DIVIDEND - REMAINDER) / DIVISOR ))";
+#)
 
 help () {
 	echo 'Usage:';
