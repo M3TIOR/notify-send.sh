@@ -36,23 +36,23 @@ TMP="${XDG_RUNTIME_DIR:-/tmp}";
 mkdir -p "$PROCDIR/.bin";
 PATH="$PROCDIR/.bin:$PATH";
 
-if ! type jq 1>/dev/null; then
-	# The only package that needs to be latest is shellcheck because it provides
-	# protection of our sourcecode. As much as I'd like to have both sources
-	# hash validated to eliminate the MiM risk vector, I can't for all systems.
-	# Neither package author provides checksums.
-	echo "Fetching jq...";
-	curl -L --progress-bar \
-		-o "$PROCDIR/.bin/jq" \
-		"https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64";
+# REEE my script busted, so Imma use my system's shellcheck because I'm flimsy
+# and change my mind easily :P
+# TODO: Semver Version enforcement for safety.
+if ! command -v shellcheck 1>/dev/null; then
+	if ! command -v jq 1>/dev/null; then
+		# The only package that needs to be latest is shellcheck because it provides
+		# protection of our sourcecode. As much as I'd like to have both sources
+		# hash validated to eliminate the MiM risk vector, I can't for all systems.
+		# Neither package author provides checksums.
+		echo "Fetching jq...";
+		curl -L --progress-bar \
+			-o "$PROCDIR/.bin/jq" \
+			"https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64";
+	
+		chmod +x "$PROCDIR/.bin/jq";
+	fi;
 
-	chmod +x "$PROCDIR/.bin/jq";
-fi;
-
-# Enforce using the latest shellcheck.
-# Screw the current users installation if they have one, I don't want to deal
-# with that balognia.
-if ! test -x "$PROCDIR/.bin/shellcheck"; then
 	RELEASES="$(tempfile)";
 	TARGET="$(tempfile)";
 	curl -s \
