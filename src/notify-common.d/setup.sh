@@ -33,21 +33,9 @@ export SHELL="$SHELL";
 
 # BUGFIX: Prevents nested shells from being unable to log.
 export XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR";
+export LOGGING="${LOGGING:=false}";
 export LOGFILE="${LOGFILE:=$TMP/notify-send.$$.log}";
 export DEBUG="${DEBUG:=false}";
-
-# Record initial FDs for processing later.
-FD1="$(readlink -n -f /proc/$$/fd/1)";
-FD2="$(readlink -n -f /proc/$$/fd/2)";
-
-################################################################################
-## Functions
-
-cleanup(){
-	if ! $DEBUG; then
-		rm -f "$LOGFILE.1" "$LOGFILE.2";
-	fi;
-}
 
 ################################################################################
 ## Main Script
@@ -55,30 +43,32 @@ cleanup(){
 # NOTE: This should execute prior to all other code besides global variables
 #       and function definitions.
 
-# Redirect to logfiles.
-exec 1>>"$LOGFILE.1";
-exec 2>>"$LOGFILE.2";
+if $LOGGING; then
+	# Record initial FDs for processing later.
+	FD1="$(readlink -n -f /proc/$$/fd/1)";
+	FD2="$(readlink -n -f /proc/$$/fd/2)";
 
-if $DEBUG; then
-	PS4="\$SELF in PID#\$\$ @\$LINENO: ";
-	set -x;
-	trap "set >&2;" 0;
+	# Redirect to logfiles.
+	exec 1>>"$LOGFILE.1";
+	exec 2>>"$LOGFILE.2";
+
+	if $DEBUG; then
+		PS4="\$SELF in PID#\$\$ @\$LINENO: ";
+		set -x;
+		trap "set >&2;" 0;
+	fi;
+
+	# And this will pick up the log, redirecting it to the terminal if we have one.
+	if test -n "$FD1" -a "$FD1" != "/dev/null" -a "$FD1" != "$LOGFILE.1"; then
+		tail --pid="$$" -f "$LOGFILE.1" >> "$FD1" & trap "kill $!;" 0;
+	fi;
+	if test -n "$FD2" -a "$FD2" != "/dev/null" -a "$FD2" != "$LOGFILE.2"; then
+		tail --pid="$$" -f "$LOGFILE.2" >> "$FD2" & trap "kill $!;" 0;
+	fi;
+
+	# XXX: Fixes a racing condition caused by the shared logging setup.
+	sleep 0.01;
 fi;
-
-# And this will pick up the log, redirecting it to the terminal if we have one.
-if test -n "$FD1" -a "$FD1" != "/dev/null" -a "$FD1" != "$LOGFILE.1"; then
-	tail --pid="$$" -f "$LOGFILE.1" >> "$FD1" & trap "kill $!;" 0;
-fi;
-if test -n "$FD2" -a "$FD2" != "/dev/null" -a "$FD2" != "$LOGFILE.2"; then
-	tail --pid="$$" -f "$LOGFILE.2" >> "$FD2" & trap "kill $!;" 0;
-fi;
-
-# XXX: Fixes a racing condition caused by the shared logging setup.
-sleep 0.01;
-
-# Always cleanup on explitcit exit. Where we exit without the command, we're
-# passing execution to the next script in the chain.
-alias exit="cleanup; exit";
 
 # Micro-optimization. Maybe, that's more of a parent script calling this one
 # kind of deal.

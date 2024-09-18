@@ -551,10 +551,6 @@ if test -n "$ACMDS"; then
 	# the filesystem doesn't support linux executable permissions bit,
 	# or it's been left unset.
 	eval "setsid /bin/sh \"$PROCDIR/notify-action.sh\" $ID $ACMDS >/dev/null &";
-else
-	# Since we know there won't be any scripts to inherit the log files from,
-	# cleanup on exit.
-	trap "cleanup" 0;
 fi;
 
 if $EXPLICIT_CLOSE && test "$EXPIRE_TIME" -ge 0; then

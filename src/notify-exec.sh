@@ -80,15 +80,14 @@ while test "$#" -gt 0; do
 done;
 
 notify_error() {
+	if $LOGGING; then LOGFILE_BODY="<a href=\"file://$LOGFILE.action\">See the full log in \`$LOGPATH.action\`</a>\n"; else LOGFILE_BODY=; fi;
 	/bin/sh "$PROCDIR/notify-send.sh" -q -t 1 -u critical \
 		"Action Failed: $1" \
-		"<b>Action:</b> <u><i>$CMD_INPUT</i></u>\n<a href=\"file://$LOGFILE.action\">See the full log in \`$LOGPATH.action\`</a>\n<b>Raw Output:</b> <i>$CMD_OUTPUT</i>";
-	NOTIFIED="true";
+		"<b>Action:</b> <u><i>$CMD_INPUT</i></u>\n$LOGFILE_BODY<b>Raw Output:</b> <i>$CMD_OUTPUT</i>";
 }
 
 notify_success() {
 	/bin/sh "$PROCDIR/notify-send.sh" -q -t 1 -u low "Success!" "$SUCCESS_MSG";
-	NOTIFIED="true";
 }
 
 CMD_INPUT="$*";
@@ -98,13 +97,12 @@ CMD_OUTPUT="$($SHELL -c "$*")" ||
 CMD_STATUS="$?";
 
 # Print full log to file.
-printf '%s' "$CMD_OUTPUT" > "$LOGFILE.action";
+if $LOGGING; then printf '%s' "$CMD_OUTPUT" > "$LOGFILE.action"; fi;
 # Two heads truncate the log into a reasonable size for a notification body.
 CMD_OUTPUT="$(printf '%s' "$CMD_OUTPUT" | head -n 4 | head -c 512)";
 
 
 if $NOTIFY_CMD_SUCCESS && test "$CMD_STATUS" -eq 0; then
-	rm -f "$LOGFILE.action";
 	notify_success;
 elif $NOTIFY_CMD_FAILURE && test "$CMD_STATUS" -ne 0; then
 	case "$CMD_STATUS" in
@@ -140,5 +138,3 @@ elif $NOTIFY_CMD_FAILURE && test "$CMD_STATUS" -ne 0; then
 		*)        notify_error "Unknown Error";;
 	esac;
 fi;
-
-if ! $NOTIFIED; then cleanup; fi;
