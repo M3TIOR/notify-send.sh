@@ -116,6 +116,14 @@ filter_pattern()
 	printf '%s' "$DONE";
 )
 
+long_divide()
+(
+	DIVIDEND="$1"; DIVISOR="$2"; RESULT=''; l=0; DECIMAL=false;
+	do
+	REMAINDER="$((DIVIDEND % DIVISOR))";
+	RESULT="${RESULT}$(( (DIVIDEND - REMAINDER) / DIVISOR ))";
+)
+
 help () {
 	echo 'Usage:';
 	echo '\tnotify-send.sh [OPTION...] SUMMARY [BODY] - creates a notification';
