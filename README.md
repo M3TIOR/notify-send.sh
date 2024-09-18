@@ -152,4 +152,4 @@ notify-send.sh --list-compatabilies;
 [POSIX]: https://pubs.opengroup.org/onlinepubs/9699919799
 [coreutils]: https://git.savannah.gnu.org/cgit/coreutils.git/tree/README?h=v8.27#n8
 [big-changes]: https://github.com/bkw777/mainline/blob/master/lib/notify_send/mainline_changes.txt
-[standard]: https://developer.gnome.org/notification-spec/
+[standard]: https://web.archive.org/web/20200917110559/https://developer.gnome.org/notification-spec/
